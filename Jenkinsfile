@@ -27,6 +27,7 @@ pipeline {
                 sh 'go build -o main main.go'
             }
         }
+
         stage('Zip Build') {
             steps {
                 sh '''
@@ -38,4 +39,5 @@ pipeline {
                 '''
             }
         }
+    }
 }
