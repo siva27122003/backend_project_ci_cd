@@ -24,19 +24,18 @@ pipeline {
 
         stage('Build') {
             steps {
-                sh 'mkdir -p bin'
-                sh 'go build -o bin/server'
-                sh 'ls -l bin'
+                sh 'go build -o main main.go'
             }
         }
-    }
-
-    post {
-        success {
-            archiveArtifacts artifacts: 'bin/server', fingerprint: true
+        stage('Zip Build') {
+            steps {
+                sh '''
+                    apt-get update
+                    apt-get install zip 
+                    mkdir -p artifact_output
+                    cd Jenkins_pipeline/src
+                    zip ../../artifact_output/bidding_app.zip main
+                '''
+            }
         }
-        always {
-            cleanWs()
-        }
-    }
 }
