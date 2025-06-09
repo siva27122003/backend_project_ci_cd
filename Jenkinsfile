@@ -30,6 +30,9 @@ pipeline {
     }
 
     post {
+        success{
+            archieveArtifacts artifacts: 'bin/server',fingerprint:true
+        }
         always {
             cleanWs()
         }
