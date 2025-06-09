@@ -2,11 +2,12 @@ pipeline {
     agent any
 
     tools {
-      go 'Go-1.24.4'
+        go 'Go-1.20' 
     }
 
     environment {
         GOPATH = "${env.WORKSPACE}/go"
+        GOCACHE = "${env.WORKSPACE}/.cache/go-build"
     }
 
     stages {
@@ -16,25 +17,33 @@ pipeline {
             }
         }
 
+        stage('Clean Go Cache') {
+            steps {
+                sh 'go clean -modcache'
+            }
+        }
+
         stage('Install Dependencies') {
             steps {
-                sh 'go mod tidy'
+                sh 'export GO111MODULE=on && go mod tidy'
             }
         }
 
         stage('Build') {
             steps {
-                sh 'go build -o main main.go'
+                sh 'go build -o bin/server'
             }
         }
 
         stage('Zip Build') {
             steps {
-                sh '''
-                    mkdir -p artifact_output
-                    cd Jenkins_pipeline/src
-                    zip ../../artifact_output/bidding_app.zip main
-                '''
+                sh 'zip -r build.zip bin/'
+            }
+        }
+
+        stage('Archive Artifact') {
+            steps {
+                archiveArtifacts artifacts: 'build.zip', fingerprint: true
             }
         }
     }
