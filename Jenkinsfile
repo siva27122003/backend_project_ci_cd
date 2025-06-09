@@ -24,7 +24,7 @@ pipeline {
 
         stage('Build') {
             steps {
-                sh 'go build -o bin/server ./cmd/server'
+                sh 'go build -o bin/server'
             }
         }
     }
