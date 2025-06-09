@@ -31,8 +31,6 @@ pipeline {
         stage('Zip Build') {
             steps {
                 sh '''
-                    apt-get update
-                    apt-get install zip 
                     mkdir -p artifact_output
                     cd Jenkins_pipeline/src
                     zip ../../artifact_output/bidding_app.zip main
