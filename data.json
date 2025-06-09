@@ -1,0 +1,24 @@
+[{
+    "user_name": "sivasankar",
+    "email": "sivasankar@example.com",
+    "phone_number": "7895682910",
+    "password": "Siva@2003",
+    "role": "Farmer",
+    "location": "Somewhere"
+  },
+  {
+    "email": "sujatha213@gmail.com",
+    "location": "Mangalam",
+    "password": "Sujima@2003",
+    "phone_number": "9344466349",
+    "role": "Vendor",
+    "user_name": "suji_s"
+},
+
+
+  {
+    "farmer_id": 1,
+    "id": 7,  
+    "digital_id": 459996,
+    "land_in_hectares": 10
+  }]

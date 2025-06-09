@@ -1,0 +1,723 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>handler: Go Coverage Report</title>
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">GRPC/handler/biddservice.go (0.0%)</option>
+				
+				<option value="file1">GRPC/handler/categoryservice.go (0.0%)</option>
+				
+				<option value="file2">GRPC/handler/commodityservice.go (0.0%)</option>
+				
+				<option value="file3">GRPC/handler/farmerservice.go (13.0%)</option>
+				
+				<option value="file4">GRPC/handler/userservice.go (85.7%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">not covered</span>
+				<span class="cov8">covered</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package Server
+
+import (
+        Config "GRPC/Config"
+        "GRPC/model"
+        "GRPC/pb" // Import email utility
+        "context"
+        "errors"
+        "log"
+)
+
+type BidServer struct {
+        pb.UnimplementedBidServiceServer
+}
+
+func (s *BidServer) CreateBid(ctx context.Context, in *pb.Bid) (*pb.BidResponse, error) <span class="cov0" title="0">{
+        bid := &amp;model.Bidding{
+                CommodityID: int32(in.CommodityId),
+                Userid:      int32(in.UserId),
+                BidAmount:   float32(in.BidAmount),
+                BidStatus:   in.Status,
+        }
+
+        res := Config.DB.Create(bid)
+        if res.Error != nil </span><span class="cov0" title="0">{
+                return nil, errors.New("error creating bid")
+        }</span>
+
+        <span class="cov0" title="0">log.Printf("New Bid Created with ID: %d", bid.Bidid)
+
+        return &amp;pb.BidResponse{
+                Bid: &amp;pb.Bid{
+                        BidId:       bid.Bidid,
+                        CommodityId: bid.CommodityID,
+                        UserId:      bid.Userid,
+                        BidAmount:   bid.BidAmount,
+                        Status:      bid.BidStatus,
+                }, Message: "Bid created..",
+        }, nil</span>
+}
+
+func (s *BidServer) UpdateBid(ctx context.Context, in *pb.Bid) (*pb.BidResponse, error) <span class="cov0" title="0">{
+        var bid model.Bidding
+
+        if err := Config.DB.First(&amp;bid, in.BidId).Error; err != nil </span><span class="cov0" title="0">{
+                return nil, errors.New("bid not found")
+        }</span>
+
+        <span class="cov0" title="0">bid.BidAmount = float32(in.BidAmount)
+        bid.BidStatus = in.Status
+
+        if err := Config.DB.Save(&amp;bid).Error; err != nil </span><span class="cov0" title="0">{
+                return nil, errors.New("error updating bid")
+        }</span>
+
+        <span class="cov0" title="0">return &amp;pb.BidResponse{
+                Bid: &amp;pb.Bid{
+                        BidId:       bid.Bidid,
+                        CommodityId: bid.CommodityID,
+                        UserId:      bid.Userid,
+                        BidAmount:   bid.BidAmount,
+                        Status:      bid.BidStatus,
+                }, Message: "Bid updated..",
+        }, nil</span>
+}
+
+func (s *BidServer) GetBidByCommodityId(ctx context.Context, in *pb.BidRequest) (*pb.BidList, error) <span class="cov0" title="0">{
+        var bids []model.Bidding
+
+        if err := Config.DB.Where("commodity_id = ?", in.CommodityId).Find(&amp;bids).Error; err != nil </span><span class="cov0" title="0">{
+                return nil, errors.New("error fetching bids")
+        }</span>
+
+        <span class="cov0" title="0">var bidList []*pb.Bid
+        for _, bid := range bids </span><span class="cov0" title="0">{
+                bidList = append(bidList, &amp;pb.Bid{
+                        BidId:       bid.Bidid,
+                        CommodityId: bid.CommodityID,
+                        UserId:      bid.Userid,
+                        BidAmount:   bid.BidAmount,
+                        Status:      bid.BidStatus,
+                })
+        }</span>
+
+        <span class="cov0" title="0">return &amp;pb.BidList{Bids: bidList}, nil</span>
+}
+
+// ✅ Bid Accept Function with Email Notification
+func (s *BidServer) BidAccept(ctx context.Context, in *pb.BidRequest) (*pb.BidResponse, error) <span class="cov0" title="0">{
+        var bid model.Bidding
+        var commodity model.Commodity
+
+        // Find the bid
+        if err := Config.DB.First(&amp;bid, in.BidId).Error; err != nil </span><span class="cov0" title="0">{
+                return nil, errors.New("bid not found")
+        }</span>
+
+        // Update bid status to accepted
+        <span class="cov0" title="0">if err := Config.DB.Model(&amp;bid).Update("bid_status", "accepted").Error; err != nil </span><span class="cov0" title="0">{
+                return nil, errors.New("failed to update bid status")
+        }</span>
+
+        // Reject all other bids for the same commodity
+        <span class="cov0" title="0">if err := Config.DB.Model(&amp;model.Bidding{}).
+                Where("commodity_id = ? AND bidid != ?", bid.CommodityID, bid.Bidid).
+                Update("bid_status", "rejected").Error; err != nil </span><span class="cov0" title="0">{
+                return nil, errors.New("failed to reject other bids")
+        }</span>
+
+        // Update commodity availability to false
+        <span class="cov0" title="0">if err := Config.DB.First(&amp;commodity, bid.CommodityID).Error; err != nil </span><span class="cov0" title="0">{
+                return nil, errors.New("commodity not found")
+        }</span>
+
+        <span class="cov0" title="0">commodity.Availability = false
+        if err := Config.DB.Save(&amp;commodity).Error; err != nil </span><span class="cov0" title="0">{
+                return nil, errors.New("failed to update commodity availability")
+        }</span>
+        <span class="cov0" title="0">return &amp;pb.BidResponse{
+                Bid: &amp;pb.Bid{
+                        BidId:       bid.Bidid,
+                        CommodityId: bid.CommodityID,
+                        UserId:      bid.Userid,
+                        BidAmount:   bid.BidAmount,
+                        Status:      "accepted",
+                },
+                Message: "Bid accepted successfully, commodity marked unavailable",
+        }, nil</span>
+}
+
+func (s *BidServer) DeleteBid(ctx context.Context, in *pb.BidRequest) (*pb.BidResponse, error) <span class="cov0" title="0">{
+        var bid model.Bidding
+
+        if err := Config.DB.Where("bidid = ?", in.BidId).Delete(&amp;bid).Error; err != nil </span><span class="cov0" title="0">{
+                return nil, errors.New("error deleting bid")
+        }</span>
+
+        <span class="cov0" title="0">return &amp;pb.BidResponse{
+                Message: "Bid deleted successfully",
+        }, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">package Server
+
+import (
+        "GRPC/Config"
+        "GRPC/model"
+        "GRPC/pb"
+        "context"
+        "errors"
+        "log"
+)
+
+type CategoryServer struct {
+        pb.UnimplementedCategoryServiceServer
+}
+
+// CreateCategory adds a new category to the database
+func (s *CategoryServer) CreateCategory(ctx context.Context, in *pb.Category) (*pb.CategoryResponse, error) <span class="cov0" title="0">{
+        category := &amp;model.Category{
+                ID:           int32(in.Id),
+                CategoryName: in.CategoryName,
+        }
+
+        err := Config.DB.Create(&amp;category).Error
+        if err != nil </span><span class="cov0" title="0">{
+                log.Printf("Error creating category: %v", err)
+                return nil, errors.New("error saving category details")
+        }</span>
+
+        <span class="cov0" title="0">log.Printf("The Category Created with ID: %d", category.ID)
+        return &amp;pb.CategoryResponse{Category: in}, nil</span>
+}
+
+// GetCategories retrieves all categories from the database
+func (s *CategoryServer) GetCategories(ctx context.Context, in *pb.Empty) (*pb.CategoryList, error) <span class="cov0" title="0">{
+        var categories []model.Category
+        err := Config.DB.Find(&amp;categories).Error
+        if err != nil </span><span class="cov0" title="0">{
+                log.Printf("Error retrieving categories: %v", err)
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">var pbcategory []*pb.Category
+        for _, cat := range categories </span><span class="cov0" title="0">{
+                pbcategory = append(pbcategory, &amp;pb.Category{
+                        Id:           int32(cat.ID),
+                        CategoryName: cat.CategoryName,
+                })
+        }</span>
+
+        <span class="cov0" title="0">return &amp;pb.CategoryList{Categories: pbcategory}, nil</span>
+}
+
+// DeleteCategory removes a category from the database by ID
+func (s *CategoryServer) DeleteCategory(ctx context.Context, in *pb.CategoryRequest) (*pb.DeleteResponse, error) <span class="cov0" title="0">{
+        var category model.Category
+
+        err := Config.DB.First(&amp;category, in.Id).Error
+        if err != nil </span><span class="cov0" title="0">{
+                log.Printf("Category not found with ID %d: %v", in.Id, err)
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">err = Config.DB.Delete(&amp;category).Error
+        if err != nil </span><span class="cov0" title="0">{
+                log.Printf("Error deleting category ID %d: %v", in.Id, err)
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">return &amp;pb.DeleteResponse{Message: "Category record deleted successfully."}, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file2" style="display: none">package Server
+
+import (
+        "GRPC/Config"
+        "GRPC/model"
+        "GRPC/pb"
+        "context"
+        "database/sql"
+        "errors"
+        "log"
+
+        "google.golang.org/grpc/codes"
+        "google.golang.org/grpc/status"
+)
+
+type CommodityServer struct {
+        pb.UnimplementedCommodityServiceServer
+        db *sql.DB
+}
+
+// CreateCommodity creates a new commodity and returns it with its category
+func (s *CommodityServer) CreateCommodity(ctx context.Context, in *pb.Commodity) (*pb.CommodityResponse, error) <span class="cov0" title="0">{
+        commodity := &amp;model.Commodity{
+                CommodityID:  int32(in.Id),
+                ProductName:  in.ProductName,
+                FarmerID:     int32(in.FarmerId),
+                Quantity:     int32(in.Quantity),
+                BasePrice:    float64(in.BasePrice),
+                Availability: in.Availability,
+                CategoryID:   int32(in.CategoryId),
+        }
+
+        if err := Config.DB.Create(&amp;commodity).Error; err != nil </span><span class="cov0" title="0">{
+                log.Printf("Failed to create commodity: %v", err)
+                return nil, errors.New("error saving commodity details")
+        }</span>
+
+        // Load the category details
+        <span class="cov0" title="0">if err := Config.DB.Preload("Category").First(&amp;commodity, commodity.CommodityID).Error; err != nil </span><span class="cov0" title="0">{
+                log.Printf("Failed to fetch created commodity with category: %v", err)
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">log.Printf("Commodity created with ID: %v", commodity.CommodityID)
+
+        return &amp;pb.CommodityResponse{
+                Commodity: &amp;pb.Commodity{
+                        Id:           commodity.CommodityID,
+                        ProductName:  commodity.ProductName,
+                        FarmerId:     commodity.FarmerID,
+                        Quantity:     commodity.Quantity,
+                        BasePrice:    float32(commodity.BasePrice),
+                        Availability: commodity.Availability,
+                        CategoryId:   commodity.CategoryID,
+                },
+                Category: &amp;pb.Category{
+                        Id:           commodity.CategoryID,
+                        CategoryName: commodity.Category.CategoryName,
+                },
+        }, nil</span>
+}
+
+// GetCommodities returns all commodities
+func (s *CommodityServer) GetCommodities(ctx context.Context, in *pb.Empty) (*pb.CommodityList, error) <span class="cov0" title="0">{
+        var commodities []model.Commodity
+
+        if err := Config.DB.Find(&amp;commodities).Error; err != nil </span><span class="cov0" title="0">{
+                log.Printf("Failed to fetch commodities: %v", err)
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">var pbCommodities []*pb.Commodity
+        for _, com := range commodities </span><span class="cov0" title="0">{
+                pbCommodities = append(pbCommodities, &amp;pb.Commodity{
+                        Id:           com.CommodityID,
+                        ProductName:  com.ProductName,
+                        FarmerId:     com.FarmerID,
+                        Quantity:     com.Quantity,
+                        BasePrice:    float32(com.BasePrice),
+                        Availability: com.Availability,
+                        CategoryId:   com.CategoryID,
+                })
+        }</span>
+
+        <span class="cov0" title="0">return &amp;pb.CommodityList{Commodities: pbCommodities}, nil</span>
+}
+
+// DeleteCommodity deletes a commodity by ID
+func (s *CommodityServer) DeleteCommodity(ctx context.Context, in *pb.CommodityRequest) (*pb.DeleteResponse, error) <span class="cov0" title="0">{
+        var commodity model.Commodity
+
+        if err := Config.DB.First(&amp;commodity, in.Id).Error; err != nil </span><span class="cov0" title="0">{
+                log.Println("Commodity not found:", err)
+                return nil, errors.New("commodity not found")
+        }</span>
+
+        <span class="cov0" title="0">if err := Config.DB.Delete(&amp;commodity).Error; err != nil </span><span class="cov0" title="0">{
+                log.Println("Failed to delete commodity:", err)
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">return &amp;pb.DeleteResponse{Message: "Commodity deleted successfully"}, nil</span>
+}
+
+// UpdateCommodity updates a commodity and optionally its category
+func (s *CommodityServer) UpdateCommodity(ctx context.Context, in *pb.UpdateCommodityReq) (*pb.CommodityResponse, error) <span class="cov0" title="0">{
+        var commodity model.Commodity
+
+        if err := Config.DB.Preload("Category").First(&amp;commodity, in.Id).Error; err != nil </span><span class="cov0" title="0">{
+                log.Println("Commodity not found:", err)
+                return nil, errors.New("commodity not found")
+        }</span>
+
+        <span class="cov0" title="0">commodity.ProductName = in.ProductName
+        commodity.Quantity = in.Quantity
+        commodity.BasePrice = float64(in.BasePrice)
+        commodity.Availability = in.Availability
+
+        if in.CategoryName != "" </span><span class="cov0" title="0">{
+                commodity.Category.CategoryName = in.CategoryName
+        }</span>
+
+        <span class="cov0" title="0">if err := Config.DB.Save(&amp;commodity).Error; err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">if err := Config.DB.Save(&amp;commodity.Category).Error; err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">return &amp;pb.CommodityResponse{
+                Commodity: &amp;pb.Commodity{
+                        Id:           commodity.CommodityID,
+                        ProductName:  commodity.ProductName,
+                        FarmerId:     commodity.FarmerID,
+                        Quantity:     commodity.Quantity,
+                        BasePrice:    float32(commodity.BasePrice),
+                        Availability: commodity.Availability,
+                        CategoryId:   commodity.CategoryID,
+                },
+                Category: &amp;pb.Category{
+                        Id:           commodity.CategoryID,
+                        CategoryName: commodity.Category.CategoryName,
+                },
+        }, nil</span>
+}
+
+// GetCommodityByID returns a single commodity by ID
+func (s *CommodityServer) GetCommodityByID(ctx context.Context, in *pb.CommodityRequest) (*pb.CommodityResponse, error) <span class="cov0" title="0">{
+        var commodity model.Commodity
+
+        if err := Config.DB.Preload("Category").First(&amp;commodity, in.Id).Error; err != nil </span><span class="cov0" title="0">{
+                log.Printf("Commodity not found: %v", err)
+                return nil, status.Errorf(codes.NotFound, "Commodity not found")
+        }</span>
+
+        <span class="cov0" title="0">return &amp;pb.CommodityResponse{
+                Commodity: &amp;pb.Commodity{
+                        Id:           commodity.CommodityID,
+                        ProductName:  commodity.ProductName,
+                        FarmerId:     commodity.FarmerID,
+                        Quantity:     commodity.Quantity,
+                        BasePrice:    float32(commodity.BasePrice),
+                        Availability: commodity.Availability,
+                        CategoryId:   commodity.CategoryID,
+                },
+                Category: &amp;pb.Category{
+                        Id:           commodity.CategoryID,
+                        CategoryName: commodity.Category.CategoryName,
+                },
+        }, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file3" style="display: none">package Server
+
+import (
+        "GRPC/model"
+        "GRPC/pb"
+        "context"
+        "errors"
+        "log"
+
+        "google.golang.org/grpc/codes"
+        "google.golang.org/grpc/status"
+        "gorm.io/gorm"
+)
+
+type FarmerServer struct {
+        pb.UnimplementedFarmerServiceServer
+        DB *gorm.DB
+}
+
+func (s *FarmerServer) CreateFarmer(ctx context.Context, in *pb.Farmer) (*pb.FarmerResponse, error) <span class="cov8" title="1">{
+
+        farmer := &amp;model.Farmer{
+                UserID:      in.GetId(),
+                DigitalId:   in.GetDigitalId(),
+                LandHectare: in.GetLandInHectares(),
+        }
+        res := s.DB.Create(farmer)
+        if res.Error != nil </span><span class="cov0" title="0">{
+                return nil, errors.New("error saving farmer details")
+        }</span>
+
+        <span class="cov8" title="1">res1 := s.DB.Preload("User").First(&amp;farmer, farmer.FarmerID)
+
+        log.Printf("New Farmer Created with ID: %d and Farmer name %v", farmer.FarmerID, farmer.User.Name)
+
+        if res1.Error != nil </span><span class="cov0" title="0">{
+                return nil, res1.Error
+        }</span>
+
+        <span class="cov8" title="1">return &amp;pb.FarmerResponse{
+                Farmer: &amp;pb.Farmer{
+                        FarmerId:       farmer.FarmerID,
+                        Id:             farmer.UserID,
+                        DigitalId:      farmer.DigitalId,
+                        LandInHectares: farmer.LandHectare,
+                },
+                User: &amp;pb.User{
+                        Id:          int32(farmer.User.Userid),
+                        UserName:    farmer.User.Name,
+                        Email:       farmer.User.Email,
+                        PhoneNumber: farmer.User.Phone,
+                        Password:    farmer.User.Password,
+                        Role:        farmer.User.Role,
+                        Location:    farmer.User.Location,
+                },
+        }, nil</span>
+}
+
+func (s *FarmerServer) UpdateFarmer(ctx context.Context, in *pb.UpdateFarmerRequest) (*pb.FarmerResponse, error) <span class="cov0" title="0">{
+        var farmer model.Farmer
+
+        // Fetch farmer with user
+        if err := s.DB.Preload("User").First(&amp;farmer, in.FarmerId).Error; err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        // Update farmer fields
+        <span class="cov0" title="0">farmer.DigitalId = in.DigitalId
+        farmer.LandHectare = in.LandInHectares
+
+        // Update user fields if provided
+        if in.UserName != "" </span><span class="cov0" title="0">{
+                farmer.User.Name = in.UserName
+        }</span>
+        <span class="cov0" title="0">if in.Email != "" </span><span class="cov0" title="0">{
+                farmer.User.Email = in.Email
+        }</span>
+        <span class="cov0" title="0">if in.PhoneNumber != "" </span><span class="cov0" title="0">{
+                farmer.User.Phone = in.PhoneNumber
+        }</span>
+        <span class="cov0" title="0">if in.Password != "" </span><span class="cov0" title="0">{
+                farmer.User.Password = in.Password
+        }</span>
+        <span class="cov0" title="0">if in.Location != "" </span><span class="cov0" title="0">{
+                farmer.User.Location = in.Location
+        }</span>
+        <span class="cov0" title="0">if in.Role != "" </span><span class="cov0" title="0">{
+                farmer.User.Role = in.Role
+        }</span>
+
+        <span class="cov0" title="0">log.Printf("Farmer before save: %+v, User: %+v", farmer, farmer.User)
+
+        tx := s.DB.Begin()
+        defer func() </span><span class="cov0" title="0">{
+                if r := recover(); r != nil </span><span class="cov0" title="0">{
+                        tx.Rollback()
+                }</span>
+        }()
+
+        // Save User first to ensure parent exists
+        <span class="cov0" title="0">if err := tx.Save(&amp;farmer.User).Error; err != nil </span><span class="cov0" title="0">{
+                tx.Rollback()
+                return nil, err
+        }</span>
+
+        // Update farmer.UserID in case it was zero or changed
+        <span class="cov0" title="0">farmer.UserID = farmer.User.Userid
+
+        // Save Farmer now with valid user_id FK
+        if err := tx.Save(&amp;farmer).Error; err != nil </span><span class="cov0" title="0">{
+                tx.Rollback()
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">if err := tx.Commit().Error; err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">return &amp;pb.FarmerResponse{
+                Farmer: &amp;pb.Farmer{
+                        FarmerId:       farmer.FarmerID,
+                        Id:             farmer.UserID,
+                        DigitalId:      farmer.DigitalId,
+                        LandInHectares: farmer.LandHectare,
+                },
+                User: &amp;pb.User{
+                        Id:          int32(farmer.User.Userid),
+                        UserName:    farmer.User.Name,
+                        Email:       farmer.User.Email,
+                        PhoneNumber: farmer.User.Phone,
+                        Password:    farmer.User.Password,
+                        Role:        farmer.User.Role,
+                        Location:    farmer.User.Location,
+                },
+        }, nil</span>
+}
+
+func (s *FarmerServer) GetFarmerByID(ctx context.Context, in *pb.FarmerRequest) (*pb.FarmerResponse, error) <span class="cov0" title="0">{
+        var farmer model.Farmer
+        err := s.DB.Preload("User").First(&amp;farmer, in.FarmerId).Error
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, status.Errorf(codes.NotFound, "Farmer not found")
+        }</span>
+        <span class="cov0" title="0">return &amp;pb.FarmerResponse{
+                Farmer: &amp;pb.Farmer{
+                        FarmerId:       farmer.FarmerID,
+                        Id:             farmer.UserID,
+                        DigitalId:      farmer.DigitalId,
+                        LandInHectares: float32(farmer.LandHectare),
+                },
+                User: &amp;pb.User{
+                        Id:          farmer.User.Userid,
+                        UserName:    farmer.User.Name,
+                        Email:       farmer.User.Email,
+                        PhoneNumber: farmer.User.Phone,
+                        Password:    farmer.User.Password,
+                        Role:        farmer.User.Role,
+                        Location:    farmer.User.Location,
+                },
+        }, nil</span>
+}
+
+func (s *FarmerServer) DeleteFarmer(ctx context.Context, in *pb.FarmerRequest) (*pb.DeleteResponse, error) <span class="cov0" title="0">{
+        var farmer model.Farmer
+        data := s.DB.First(&amp;farmer, in.FarmerId)
+        if data.Error != nil </span><span class="cov0" title="0">{
+                return nil, errors.New("Farmer not found")
+        }</span>
+        <span class="cov0" title="0">err := s.DB.Delete(&amp;farmer)
+        if err.Error != nil </span><span class="cov0" title="0">{
+                return nil, err.Error
+        }</span>
+        <span class="cov0" title="0">return &amp;pb.DeleteResponse{Message: "Farmer Record deleted successfully..!"}, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file4" style="display: none">package Server
+
+import (
+        "GRPC/model"
+        "GRPC/pb"
+        "context"
+        "errors"
+        "log"
+
+        "gorm.io/gorm"
+)
+
+type Server struct {
+        pb.UnimplementedUserServiceServer
+        DB *gorm.DB
+}
+
+func convertToPbUser(user *model.User) *pb.User <span class="cov8" title="1">{
+        return &amp;pb.User{
+                Id:          user.Userid,
+                UserName:    user.Name,
+                Email:       user.Email,
+                PhoneNumber: user.Phone,
+                Password:    user.Password,
+                Role:        user.Role,
+                Location:    user.Location,
+        }
+}</span>
+
+func (s *Server) CreateUser(ctx context.Context, in *pb.User) (*pb.UserResponse, error) <span class="cov8" title="1">{
+        log.Printf("Received: %v", in.GetUserName())
+
+        user := &amp;model.User{
+                Name:     in.GetUserName(),
+                Email:    in.GetEmail(),
+                Phone:    in.GetPhoneNumber(),
+                Password: in.GetPassword(),
+                Role:     in.GetRole(),
+                Location: in.GetLocation(),
+        }
+
+        res := s.DB.Create(user)
+        if res.Error != nil </span><span class="cov0" title="0">{
+                return nil, errors.New("error saving user details: " + res.Error.Error())
+        }</span>
+        <span class="cov8" title="1">return &amp;pb.UserResponse{User: convertToPbUser(user)}, nil</span>
+}
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>

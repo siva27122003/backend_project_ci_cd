@@ -1,0 +1,151 @@
+syntax = "proto3";
+
+option go_package = "/pb"; 
+
+package cropconnect;
+
+service UserService {
+    rpc CreateUser(User) returns (UserResponse) {}
+}
+
+service FarmerService {
+    rpc CreateFarmer(Farmer) returns (FarmerResponse) {}
+    rpc UpdateFarmer(UpdateFarmerRequest) returns (FarmerResponse) {}
+    rpc GetFarmerByID(FarmerRequest) returns (FarmerResponse) {}
+    rpc DeleteFarmer(FarmerRequest) returns (DeleteResponse) {}
+}
+
+service CategoryService {
+  rpc CreateCategory (Category) returns (CategoryResponse) {}
+  rpc GetCategories (Empty) returns (CategoryList) {}
+  rpc DeleteCategory (CategoryRequest) returns (DeleteResponse) {}
+}
+
+service CommodityService {
+  rpc CreateCommodity (Commodity) returns (CommodityResponse) {}
+  rpc GetCommodities (Empty) returns (CommodityList) {} 
+  rpc GetCommodityByID (CommodityRequest) returns (CommodityResponse) {}
+  rpc UpdateCommodity (UpdateCommodityReq) returns (CommodityResponse) {}
+  rpc DeleteCommodity (CommodityRequest) returns (DeleteResponse) {}
+}
+service BidService {
+    rpc CreateBid(Bid) returns (BidResponse);
+    rpc UpdateBid(Bid) returns (BidResponse);
+    rpc GetBidByCommodityId(BidRequest) returns (BidList);
+    rpc DeleteBid(BidRequest) returns (BidResponse);
+    rpc BidAccept(BidRequest) returns (BidResponse);
+}
+message Bid {
+    int32 bid_id = 1;
+    int32 commodity_id = 2;
+    int32 user_id = 3;
+    float bid_amount = 4;
+    string status = 5;
+}
+
+message BidResponse {
+    Bid bid = 1;
+    string message = 2;
+}
+
+message BidRequest {
+    int32 bid_id = 1;
+    int32 commodity_id = 2;
+}
+
+message BidList {
+    repeated Bid bids = 1;
+}
+
+message User {
+    int32 id = 1;
+    string user_name = 2;
+    string email = 3;
+    string phone_number = 4;
+    string password = 5;
+    string role = 6;
+    string location = 7;
+}
+
+message UpdateCommodityReq {
+  int64 id = 1;
+  string product_name = 2;
+  float base_price = 3;
+  int32 quantity = 4;
+  bool availability = 5;
+  string category_name = 6;
+}
+message Farmer {
+    int32 farmer_id = 1;
+    int32 id = 2;
+    string digital_id = 3; 
+    float land_in_hectares = 4; 
+}
+
+message Category{
+    int32 id = 1;
+    string category_name = 2;
+}
+
+message Commodity{
+  int32 id = 1;
+  string product_name = 2;
+  int32 farmer_id = 3;
+  int32 quantity = 4;
+  float base_price = 5;
+  bool availability = 6;
+  int32 category_id = 7;
+}
+
+message UpdateFarmerRequest {
+    int32 farmer_id = 1;
+    string user_name = 2;
+    string email = 3;
+    string phone_number = 4;
+    string password = 5;
+    string location = 6;
+    string digital_id = 7; 
+    float land_in_hectares = 8; 
+    string role = 9; 
+}
+
+message FarmerRequest {
+    int32 farmer_id = 1;
+}
+
+message CategoryRequest{
+    int32 id = 1;
+}
+message CommodityRequest{
+    int32 id = 1;
+}
+
+message UserResponse {
+    User user = 1;
+}
+
+message FarmerResponse {
+    Farmer farmer = 1;
+    User user = 2;
+}
+message CategoryResponse{
+    Category category = 1;
+}
+
+message CommodityResponse{
+    Commodity commodity = 1;
+    Category category = 2;
+}
+message DeleteResponse {
+    string message = 1;
+}
+
+message CategoryList {
+  repeated Category categories = 1;
+}
+
+message CommodityList{
+    repeated Commodity commodities = 1;
+}
+
+message Empty{}
