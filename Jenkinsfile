@@ -37,7 +37,7 @@ pipeline {
 
         stage('Zip Build') {
             steps {
-                sh 'zip -r build.zip bin/'
+                sh 'zip -r build_bidding_app.zip bin/'
             }
         }
 
