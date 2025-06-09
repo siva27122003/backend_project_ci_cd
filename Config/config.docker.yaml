@@ -1,0 +1,1 @@
+dsn: "root:Sivasankar@2003@tcp(host.docker.internal:3306)/agriculture1?parseTime=true&loc=Local"
