@@ -24,7 +24,9 @@ pipeline {
 
         stage('Build') {
             steps {
+                sh 'mkdir -p bin'
                 sh 'go build -o bin/server'
+                sh 'ls -l bin'
             }
         }
     }
