@@ -30,8 +30,8 @@ pipeline {
     }
 
     post {
-        success{
-            archieveArtifacts artifacts: 'bin/server',fingerprint:true
+        success {
+            archiveArtifacts artifacts: 'bin/server', fingerprint: true
         }
         always {
             cleanWs()
