@@ -14,7 +14,7 @@ RUN wget https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz && \
 ENV PATH=$PATH:/usr/local/go/bin
 ENV GOPATH=/opt/go
 ENV PATH=$PATH:$GOPATH/bin
-
+RUN apt-get update && apt-get install -y sudo
 RUN mkdir -p /opt/go && chown -R jenkins:jenkins /opt/go
 
 RUN curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg && \
