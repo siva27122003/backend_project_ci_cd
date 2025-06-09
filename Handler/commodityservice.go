@@ -102,7 +102,6 @@ func (s *CommodityServer) DeleteCommodity(ctx context.Context, in *pb.CommodityR
 	return &pb.DeleteResponse{Message: "Commodity deleted successfully"}, nil
 }
 
-// UpdateCommodity updates a commodity and optionally its category
 func (s *CommodityServer) UpdateCommodity(ctx context.Context, in *pb.UpdateCommodityReq) (*pb.CommodityResponse, error) {
 	var commodity model.Commodity
 
@@ -145,7 +144,6 @@ func (s *CommodityServer) UpdateCommodity(ctx context.Context, in *pb.UpdateComm
 	}, nil
 }
 
-// GetCommodityByID returns a single commodity by ID
 func (s *CommodityServer) GetCommodityByID(ctx context.Context, in *pb.CommodityRequest) (*pb.CommodityResponse, error) {
 	var commodity model.Commodity
 

@@ -12,9 +12,9 @@ import (
 
 func main() {
 	Config.DbConnect()
-	db := Config.DB // ✅ Use global DB instance from config
+	db := Config.DB
 
-	lis, err := net.Listen("tcp", ":5000")
+	lis, err := net.Listen("tcp", ":5050")
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}

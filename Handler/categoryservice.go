@@ -13,7 +13,6 @@ type CategoryServer struct {
 	pb.UnimplementedCategoryServiceServer
 }
 
-// CreateCategory adds a new category to the database
 func (s *CategoryServer) CreateCategory(ctx context.Context, in *pb.Category) (*pb.CategoryResponse, error) {
 	category := &model.Category{
 		ID:           int32(in.Id),
@@ -30,7 +29,6 @@ func (s *CategoryServer) CreateCategory(ctx context.Context, in *pb.Category) (*
 	return &pb.CategoryResponse{Category: in}, nil
 }
 
-// GetCategories retrieves all categories from the database
 func (s *CategoryServer) GetCategories(ctx context.Context, in *pb.Empty) (*pb.CategoryList, error) {
 	var categories []model.Category
 	err := Config.DB.Find(&categories).Error
@@ -50,7 +48,6 @@ func (s *CategoryServer) GetCategories(ctx context.Context, in *pb.Empty) (*pb.C
 	return &pb.CategoryList{Categories: pbcategory}, nil
 }
 
-// DeleteCategory removes a category from the database by ID
 func (s *CategoryServer) DeleteCategory(ctx context.Context, in *pb.CategoryRequest) (*pb.DeleteResponse, error) {
 	var category model.Category
 

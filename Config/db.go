@@ -4,6 +4,7 @@ import (
 	"GRPC/model"
 	"fmt"
 	"log"
+	"os"
 
 	"github.com/spf13/viper"
 	"gorm.io/driver/mysql"
@@ -13,17 +14,24 @@ import (
 var DB *gorm.DB
 
 func initconfig() {
-	viper.SetConfigName("config")
-	viper.SetConfigType("yaml")
-	viper.AddConfigPath(".")
+	// Read environment variable to decide which config file to load
+	env := os.Getenv("APP_ENV") // set this to "docker" or "local"
+
+	if env == "docker" {
+		viper.SetConfigFile("config.docker.yaml")
+	} else {
+		viper.SetConfigFile("config.yaml")
+	}
+
 	err := viper.ReadInConfig()
 	if err != nil {
-		log.Fatalf("Error to read from configuration file...%s", err)
+		log.Fatalf("Error reading config file: %s", err)
 	}
 }
 
 func DbConnect() {
 	initconfig()
+
 	dsn := viper.GetString("dsn")
 	if dsn == "" {
 		log.Println("Config file doesn't have dsn...")
@@ -33,23 +41,21 @@ func DbConnect() {
 	if err != nil {
 		log.Fatalf("Failed to connect with database...%v", err)
 	}
-	fmt.Println("DB connection is succesfull...")
+	fmt.Println("DB connection is successful...")
 
+	// Auto-migrate your models
 	err = db.AutoMigrate(&model.User{})
 	if err != nil {
 		log.Fatalf("Migration failed..%v", err)
 	}
-
 	err = db.AutoMigrate(&model.Farmer{})
 	if err != nil {
 		log.Fatalf("Migration failed..%v", err)
 	}
-
 	err = db.AutoMigrate(&model.Category{})
 	if err != nil {
 		log.Fatalf("Migration failed..%v", err)
 	}
-
 	err = db.AutoMigrate(&model.Commodity{})
 	if err != nil {
 		log.Fatalf("Migration failed..%v", err)
@@ -58,6 +64,6 @@ func DbConnect() {
 	if err != nil {
 		log.Fatalf("Migration failed..%v", err)
 	}
-	DB = db
 
+	DB = db
 }

@@ -3,7 +3,7 @@ package Server
 import (
 	Config "GRPC/Config"
 	"GRPC/model"
-	"GRPC/pb" // Import email utility
+	"GRPC/pb"
 	"context"
 	"errors"
 	"log"
@@ -85,29 +85,22 @@ func (s *BidServer) GetBidByCommodityId(ctx context.Context, in *pb.BidRequest) 
 	return &pb.BidList{Bids: bidList}, nil
 }
 
-// ✅ Bid Accept Function with Email Notification
 func (s *BidServer) BidAccept(ctx context.Context, in *pb.BidRequest) (*pb.BidResponse, error) {
 	var bid model.Bidding
 	var commodity model.Commodity
 
-	// Find the bid
 	if err := Config.DB.First(&bid, in.BidId).Error; err != nil {
 		return nil, errors.New("bid not found")
 	}
 
-	// Update bid status to accepted
 	if err := Config.DB.Model(&bid).Update("bid_status", "accepted").Error; err != nil {
 		return nil, errors.New("failed to update bid status")
 	}
-
-	// Reject all other bids for the same commodity
 	if err := Config.DB.Model(&model.Bidding{}).
 		Where("commodity_id = ? AND bidid != ?", bid.CommodityID, bid.Bidid).
 		Update("bid_status", "rejected").Error; err != nil {
 		return nil, errors.New("failed to reject other bids")
 	}
-
-	// Update commodity availability to false
 	if err := Config.DB.First(&commodity, bid.CommodityID).Error; err != nil {
 		return nil, errors.New("commodity not found")
 	}
