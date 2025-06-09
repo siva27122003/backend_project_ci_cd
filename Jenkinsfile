@@ -43,7 +43,7 @@ pipeline {
 
         stage('Archive Artifact') {
             steps {
-                archiveArtifacts artifacts: 'build.zip', fingerprint: true
+                archiveArtifacts artifacts: 'build_bidding_app.zip', fingerprint: true
             }
         }
     }
