@@ -18,9 +18,9 @@ func initconfig() {
 	env := os.Getenv("APP_ENV") // set this to "docker" or "local"
 	fmt.Println("Env is ",env)
 	if env == "docker" {
-		viper.SetConfigFile("config.docker.yaml")
+		viper.SetConfigFile("Config/config.docker.yaml")
 	} else {
-		viper.SetConfigFile("config.yaml")
+		viper.SetConfigFile("Config/config.yaml")
 	}
 
 	err := viper.ReadInConfig()
