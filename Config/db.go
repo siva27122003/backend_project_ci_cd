@@ -16,7 +16,7 @@ var DB *gorm.DB
 func initconfig() {
 	// Read environment variable to decide which config file to load
 	env := os.Getenv("APP_ENV") // set this to "docker" or "local"
-
+	fmt.Println("Env is ",env)
 	if env == "docker" {
 		viper.SetConfigFile("config.docker.yaml")
 	} else {
@@ -33,6 +33,7 @@ func DbConnect() {
 	initconfig()
 
 	dsn := viper.GetString("dsn")
+	fmt.Println("Dsn is ",dsn)
 	if dsn == "" {
 		log.Println("Config file doesn't have dsn...")
 	}
