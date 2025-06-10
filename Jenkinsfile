@@ -26,20 +26,29 @@ pipeline {
 
         stage('Install Dependencies') {
             steps {
-                sh 'export GO111MODULE=on && go mod tidy'
-            }
-        }
-        
-        stage('Lint'){
-            steps{
-                sh 'go vet ./...'
-                sh 'golint ./... || true' 
+                sh '''
+                export GO111MODULE=on
+                go mod tidy
+                '''
             }
         }
 
-        stage('Test'){
-            steps{
-                sh 'go test ./Handler -v -cover'
+        stage('Lint') {
+            steps {
+                sh '''
+                export GO111MODULE=on
+                go vet ./...
+                golint ./... || true
+                '''
+            }
+        }
+
+        stage('Test') {
+            steps {
+                sh '''
+                export GO111MODULE=on
+                go test ./Handler -v -cover
+                '''
             }
         }
 
