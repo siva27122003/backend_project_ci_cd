@@ -35,6 +35,12 @@ pipeline {
                 sh 'go test ./Handler -v -cover'
             }
         }
+        stage('Lint'){
+            steps{
+                sh 'go vet ./...'
+                sh 'golint ./... || true' 
+            }
+        }
 
         stage('Build') {
             steps {
