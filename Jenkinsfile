@@ -29,16 +29,17 @@ pipeline {
                 sh 'export GO111MODULE=on && go mod tidy'
             }
         }
-
-        stage('Test'){
-            steps{
-                sh 'go test ./Handler -v -cover'
-            }
-        }
+        
         stage('Lint'){
             steps{
                 sh 'go vet ./...'
                 sh 'golint ./... || true' 
+            }
+        }
+
+        stage('Test'){
+            steps{
+                sh 'go test ./Handler -v -cover'
             }
         }
 
