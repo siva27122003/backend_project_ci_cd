@@ -14,7 +14,6 @@ import (
 var DB *gorm.DB
 
 func initconfig() {
-	// Read environment variable to decide which config file to load
 	env := os.Getenv("APP_ENV")
 	fmt.Println("Env is ", env)
 	if env == "docker" {
