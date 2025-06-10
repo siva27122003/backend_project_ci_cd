@@ -37,6 +37,7 @@ pipeline {
             steps {
                 sh '''
                 export GO111MODULE=on
+                go mod tidy  # force tidy again here
                 go vet ./...
                 golint ./... || true
                 '''
