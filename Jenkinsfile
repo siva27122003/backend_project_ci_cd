@@ -30,6 +30,12 @@ pipeline {
             }
         }
 
+        stage('Test'){
+            steps{
+                sh 'go test ./... -v -cover'
+            }
+        }
+
         stage('Build') {
             steps {
                 sh 'go build -o bin/server'
