@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     tools {
-        go 'Go-1.24.4' 
+        go 'Go-1.24.4'
     }
 
     environment {
@@ -45,6 +45,24 @@ pipeline {
         stage('Archive Artifact') {
             steps {
                 archiveArtifacts artifacts: 'build_bidding_app.zip', fingerprint: true
+            }
+        }
+
+        stage('Run with Docker Compose') {
+            steps {
+                script {
+                    sh 'docker-compose down || true'
+                    sh 'docker-compose up --build -d'
+                }
+            }
+        }
+
+        stage('Health Check') {
+            steps {
+                script {
+                    sh 'sleep 10'
+                    sh 'curl --fail http://localhost:5050 || exit 1'
+                }
             }
         }
     }
