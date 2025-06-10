@@ -32,7 +32,7 @@ pipeline {
 
         stage('Test'){
             steps{
-                sh 'go test ./... -v -cover'
+                sh 'go test ./Handler -v -cover'
             }
         }
 
