@@ -7,6 +7,7 @@ pipeline {
 
     environment {
         GOPATH = "${env.WORKSPACE}/go"
+        APP_ENV = 'docker'
         GOCACHE = "${env.WORKSPACE}/.cache/go-build"
     }
 
