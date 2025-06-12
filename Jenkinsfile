@@ -10,7 +10,7 @@ pipeline {
         APP_ENV = 'docker'
         GOCACHE = "${env.WORKSPACE}/.cache/go-build"
         DOCKER_IMAGE = 'sivasankar123/bidding-app'
-        DOCKER_TAG = latest
+        DOCKER_TAG = 'latest'
     }
 
     stages {
