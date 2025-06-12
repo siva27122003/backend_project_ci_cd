@@ -25,6 +25,9 @@ RUN curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /
     apt-get update && \
     apt-get install -y docker-ce-cli
 
+RUN apt-get update && apt-get install -y git
+
+
 RUN groupadd docker && usermod -aG docker jenkins
 
 USER jenkins
