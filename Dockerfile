@@ -1,33 +1,35 @@
-FROM jenkins/jenkins:lts
+# ---------- Stage 1: Build ----------
+FROM golang:1.21.4-alpine AS builder
 
-USER root
+WORKDIR /app
 
-RUN apt-get update && \
-    apt-get install -y curl gnupg lsb-release zip tar wget && \
-    apt-get clean
+RUN apk add --no-cache git
 
-ENV GO_VERSION=1.21.4
-RUN wget https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz && \
-    tar -C /usr/local -xzf go${GO_VERSION}.linux-amd64.tar.gz && \
-    rm go${GO_VERSION}.linux-amd64.tar.gz
+# Copy Go mod files 
+COPY go.mod go.sum ./
+RUN go mod download
 
-ENV PATH=$PATH:/usr/local/go/bin
-ENV GOPATH=/opt/go
-ENV PATH=$PATH:$GOPATH/bin
-ENV APP_ENV=docker
+# Copy the entire project
+COPY . .
 
-RUN apt-get update && apt-get install -y sudo
-RUN mkdir -p /opt/go && chown -R jenkins:jenkins /opt/go
+RUN go build -o server
 
-RUN curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg && \
-    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/debian $(lsb_release -cs) stable" \
-    > /etc/apt/sources.list.d/docker.list && \
-    apt-get update && \
-    apt-get install -y docker-ce-cli
+#  ------------- Stage 2: Minimal Runtime ------------
+FROM alpine:latest
 
-RUN apt-get update && apt-get install -y git
+# Create non-root user
+RUN adduser -D appuser
 
+WORKDIR /app
 
-RUN groupadd docker && usermod -aG docker jenkins
+# Copy the binary from builder
+COPY --from=builder /app/server .
 
-USER jenkins
+# Set permissions (optional but safe)
+USER appuser
+
+# App port (change if your app uses another)
+EXPOSE 8080
+
+# Run the app
+ENTRYPOINT ["./server"]
