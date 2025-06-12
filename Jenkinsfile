@@ -59,16 +59,16 @@ pipeline {
                 sh 'go build -o bin/server'
             }
         }
-        
         stage('Build docker image & push in docker hub'){
-          steps{
-            withCredentials([usernamePassword(credentialsId: 'docker-hub-creds', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')])
-            sh '''
-            echo "$DOCKER_PASS"| docker login -u "$DOCKER_USER" --password-stdin
-            docker build -t $DOCKER_IMAGE:$DOCKER_TAG .
-            docker push $DOCKER_IMAGE:$DOCKER_TAG
-            '''
-          }  
+            steps{
+                withCredentials([usernamePassword(credentialsId:'docker_hub',usernameVariable:"USERNAME",passwordVariable:"PASSWORD")]){
+                sh '''
+                echo "$PASSWORD"| docker login -u "$USERNAME" --password-stdin
+                docker build -t $DOCKER_IMAGE:$DOCKER_TAG .
+                docker push $DOCKER_IMAGE:$DOCKER_TAG
+                '''
+                }
+            }
         }
 
         stage('Zip Build') {
