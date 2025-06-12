@@ -25,6 +25,8 @@ WORKDIR /app
 # Copy the binary from builder
 COPY --from=builder /app/server .
 
+COPY --from=builder /app/Config ./Config
+
 # Set permissions (optional but safe)
 USER appuser
 
