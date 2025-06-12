@@ -18,12 +18,6 @@ pipeline {
             }
         }
 
-        stage('Clean Go Cache') {
-            steps {
-                sh 'go clean -modcache'
-            }
-        }
-
         stage('Install Dependencies') {
             steps {
                 sh '''
@@ -37,7 +31,6 @@ pipeline {
             steps {
                 sh '''
                 export GO111MODULE=on
-                go mod tidy  
                 go vet ./...
                 golint ./... || true
                 '''
