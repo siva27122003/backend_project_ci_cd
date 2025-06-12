@@ -9,6 +9,8 @@ pipeline {
         GOPATH = "${env.WORKSPACE}/go"
         APP_ENV = 'docker'
         GOCACHE = "${env.WORKSPACE}/.cache/go-build"
+        DOCKER_IMAGE = 'sivasankar123/bidding-app'
+        DOCKER_TAG = latest
     }
 
     stages {
@@ -56,6 +58,17 @@ pipeline {
             steps {
                 sh 'go build -o bin/server'
             }
+        }
+        
+        stage('Build docker image & push in docker hub'){
+          steps{
+            withCredentials([usernamePassword(credentialsId: 'docker-hub-creds', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')])
+            sh '''
+            echo "$DOCKER_PASS"| docker login -u "$DOCKER_USER" --password-stdin
+            docker build -t $DOCKER_IMAGE:$DOCKER_TAG .
+            docker push $DOCKER_IMAGE:$DOCKER_TAG
+            '''
+          }  
         }
 
         stage('Zip Build') {
