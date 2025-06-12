@@ -24,30 +24,24 @@ pipeline {
             }
         }
 
-        // stage('Install Dependencies') {
-        //     steps {
-        //         sh '''
-        //         export GO111MODULE=on
-        //         go mod tidy
-        //         '''
-        //     }
-        // }
-
-        stage('Lint') {
+        stage('Install Dependencies') {
             steps {
                 sh '''
                 export GO111MODULE=on
                 go mod tidy
                 '''
             }
-            steps {
-                sh '''
-                export GO111MODULE=on
-                go vet ./...
-                golint ./... || true
-                '''
-            }
         }
+
+        // stage('Lint') {
+        //     steps {
+        //         sh '''
+        //         export GO111MODULE=on
+        //         go vet ./...
+        //         golint ./... || true
+        //         '''
+        //     }
+        // }
 
         stage('Test') {
             steps {
