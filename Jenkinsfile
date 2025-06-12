@@ -24,16 +24,22 @@ pipeline {
             }
         }
 
-        stage('Install Dependencies') {
+        // stage('Install Dependencies') {
+        //     steps {
+        //         sh '''
+        //         export GO111MODULE=on
+        //         go mod tidy
+        //         '''
+        //     }
+        // }
+
+        stage('Lint') {
             steps {
                 sh '''
                 export GO111MODULE=on
                 go mod tidy
                 '''
             }
-        }
-
-        stage('Lint') {
             steps {
                 sh '''
                 export GO111MODULE=on
