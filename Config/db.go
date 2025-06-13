@@ -20,17 +20,15 @@ func DbConnect() {
 	var dsn string
 
 	if env == "docker" {
-		// Get values from environment variables
+
 		user := os.Getenv("DB_USER")
 		password := os.Getenv("DB_PASSWORD")
 		host := os.Getenv("DB_HOST")
 		port := os.Getenv("DB_PORT")
 		name := os.Getenv("DB_NAME")
 
-		// Build DSN dynamically
 		dsn = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true&loc=Local", user, password, host, port, name)
 	} else {
-		// Use local config file
 		viper.SetConfigFile("Config/config.yaml")
 		err := viper.ReadInConfig()
 		if err != nil {
@@ -50,8 +48,23 @@ func DbConnect() {
 	}
 	fmt.Println("DB connection is successful...")
 
-	// Auto-migrate your models
-	err = db.AutoMigrate(&model.User{}, &model.Farmer{}, &model.Category{}, &model.Commodity{}, &model.Bidding{})
+	err = db.AutoMigrate(&model.User{})
+	if err != nil {
+		log.Fatalf("Migration failed..%v", err)
+	}
+	err = db.AutoMigrate(&model.Farmer{})
+	if err != nil {
+		log.Fatalf("Migration failed..%v", err)
+	}
+	err = db.AutoMigrate(&model.Category{})
+	if err != nil {
+		log.Fatalf("Migration failed..%v", err)
+	}
+	err = db.AutoMigrate(&model.Commodity{})
+	if err != nil {
+		log.Fatalf("Migration failed..%v", err)
+	}
+	err = db.AutoMigrate(&model.Bidding{})
 	if err != nil {
 		log.Fatalf("Migration failed..%v", err)
 	}
