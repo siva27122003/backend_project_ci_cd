@@ -14,12 +14,18 @@ services:
       - "3307:3306"
     volumes:
       - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   bidding-app:
     image: sivasankar123/bidding-app:latest
     container_name: bidding-app
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
     environment:
       DB_USER: appuser
       DB_PASSWORD: apppass
