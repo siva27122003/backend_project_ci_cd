@@ -83,4 +83,9 @@ pipeline {
             }
         }
     }
+    post{
+        always{
+            emailext body: '<p>Build Succeeded</p>', subject: 'Build {$BUILD_NUMBER} status', to: 'sivasankar27122003@gmail.com'
+        }
+    }
 }
