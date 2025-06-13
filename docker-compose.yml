@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql-db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: agriculture1
+      MYSQL_USER: appuser
+      MYSQL_PASSWORD: apppass
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  bidding-app:
+    image: sivasankar123/bidding-app:latest
+    container_name: bidding-app
+    depends_on:
+      - mysql
+    environment:
+      DB_USER: appuser
+      DB_PASSWORD: apppass
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: agriculture1
+      APP_ENV: docker
+    ports:
+      - "5055:5050"
+
+volumes:
+  mysql_data:
