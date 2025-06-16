@@ -88,7 +88,7 @@ pipeline {
             emailext (
                 body:"""
                 <p>Build number : ${BUILD_NUMBER}<p>
-                <p>Staus : ${BUILD_STATUS}<p>
+                <p>Staus : ${currentBuild.currentResult}<p>
                 <p>This is the status for your current build.<p>
                 <p>Thank you....!<p>
                 """,subject: 'Build ${BUILD_NUMBER} status',to: 'sivasankar27122003@gmail.com'
