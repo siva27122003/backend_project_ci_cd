@@ -89,13 +89,11 @@ pipeline {
     post {
         always {
             emailext(
-                body: """
-                    <p>Build Completed</p>
-                    <p><strong>Project:</strong> Bidding App</p>
-                    <p><strong>Status:</strong> ${currentBuild.currentResult}</p>
-                    <p><strong>Build Number:</strong> ${BUILD_NUMBER}</p>
-                    <p><strong>Check Console Output:</strong> <a href="${BUILD_URL}">${BUILD_URL}</a></p>
-                """,
+                body: "<p>Build Completed</p>"+
+                    "<p><strong>Project:</strong> Bidding App</p>"+
+                    "<p><strong>Status:</strong> ${currentBuild.currentResult}</p>"+
+                    "<p><strong>Build Number:</strong> ${BUILD_NUMBER}</p>"+
+                    "<p><strong>Check Console Output:</strong> <a href="${BUILD_URL}">${BUILD_URL}</a></p>",
                 subject: "Build #${BUILD_NUMBER} - ${currentBuild.currentResult}",
                 to: 'sivasankar27122003@gmail.com'
             )
