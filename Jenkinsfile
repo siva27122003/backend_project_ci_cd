@@ -35,6 +35,7 @@ pipeline {
             }
         }
 
+        // Optional: Lint stage
         // stage('Lint') {
         //     steps {
         //         sh '''
@@ -59,14 +60,15 @@ pipeline {
                 sh 'go build -o bin/server'
             }
         }
-        stage('Build docker image & push in docker hub'){
-            steps{
-                withCredentials([usernamePassword(credentialsId:'docker-hub-creds',usernameVariable:"USERNAME",passwordVariable:"PASSWORD")]){
-                sh '''
-                echo "$PASSWORD"| docker login -u "$USERNAME" --password-stdin
-                docker build -t $DOCKER_IMAGE:$DOCKER_TAG .
-                docker push $DOCKER_IMAGE:$DOCKER_TAG
-                '''
+
+        stage('Build Docker Image & Push to Docker Hub') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'docker-hub-creds', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                    sh '''
+                    echo "$PASSWORD" | docker login -u "$USERNAME" --password-stdin
+                    docker build -t $DOCKER_IMAGE:$DOCKER_TAG .
+                    docker push $DOCKER_IMAGE:$DOCKER_TAG
+                    '''
                 }
             }
         }
@@ -83,9 +85,20 @@ pipeline {
             }
         }
     }
-    post{
-        always{
-            emailext body: '<p>Build Succeeded</p>', subject: "Build ${BUILD_NUMBER} - ${BUILD} status", to: 'sivasankar27122003@gmail.com'
+
+    post {
+        always {
+            emailext(
+                body: """
+                    <p>Build Completed</p>
+                    <p><strong>Project:</strong> Bidding App</p>
+                    <p><strong>Status:</strong> ${currentBuild.currentResult}</p>
+                    <p><strong>Build Number:</strong> ${BUILD_NUMBER}</p>
+                    <p><strong>Check Console Output:</strong> <a href="${BUILD_URL}">${BUILD_URL}</a></p>
+                """,
+                subject: "Build #${BUILD_NUMBER} - ${currentBuild.currentResult}",
+                to: 'sivasankar27122003@gmail.com'
+            )
         }
     }
 }
