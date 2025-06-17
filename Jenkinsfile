@@ -35,17 +35,6 @@ pipeline {
             }
         }
 
-        stage('Install cloc & Count Lines of Code') {
-            steps {
-                sh '''
-                apt-get update
-                apt-get install -y cloc
-                cloc . --exclude-dir=bin,vendor --out=cloc_report.txt
-                cat cloc_report.txt
-                '''
-            }
-        }
-
         stage('Test') {
             steps {
                 sh '''
