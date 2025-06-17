@@ -15,6 +15,12 @@ pipeline {
 
     stages {
 
+        stage('Checkout Code') {
+            steps {
+                checkout scm
+            }
+        }
+
         stage('Clean Go Cache') {
             steps {
                 sh 'go clean -modcache'
