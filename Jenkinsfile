@@ -17,7 +17,7 @@ pipeline {
 
         stage('Checkout Code') {
             steps {
-                checkout scm
+                git url: 'https://github.com/siva27122003/backend_project_ci_cd.git', branch: 'master'
             }
         }
 
