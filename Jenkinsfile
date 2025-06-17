@@ -16,8 +16,10 @@ pipeline {
     stages {
 
         stage('Checkout Code') {
-            cleanWs()
-            checkout scm
+            steps {
+                cleanWs()
+                checkout scm
+            }
         }
 
         stage('Clean Go Cache') {
