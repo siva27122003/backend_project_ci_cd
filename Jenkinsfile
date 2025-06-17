@@ -34,6 +34,18 @@ pipeline {
                 '''
             }
         }
+
+        stage('Install cloc & Count Lines of Code') {
+            steps {
+                sh '''
+                sudo apt-get update
+                sudo apt-get install -y cloc
+                cloc . --exclude-dir=bin,vendor --out=cloc_report.txt
+                cat cloc_report.txt
+                '''
+            }
+        }
+
         stage('Test') {
             steps {
                 sh '''
@@ -67,9 +79,9 @@ pipeline {
             }
         }
 
-        stage('Archive Artifact') {
+        stage('Archive Artifacts') {
             steps {
-                archiveArtifacts artifacts: 'build_bidding_app.zip', fingerprint: true
+                archiveArtifacts artifacts: 'build_bidding_app.zip, cloc_report.txt', fingerprint: true
             }
         }
     }
@@ -78,10 +90,10 @@ pipeline {
         always {
             emailext(
                 body: "<p>Build Completed</p>"+
-                    "<p><strong>Project:</strong> Bidding App</p>"+
-                    "<p><strong>Status:</strong> ${currentBuild.currentResult}</p>"+
-                    "<p><strong>Build Number:</strong> ${BUILD_NUMBER}</p>"+
-                    "<p><strong>Check Console Output:</strong> <a href="${BUILD_URL}">${BUILD_URL}</a></p>",
+                      "<p><strong>Project:</strong> Bidding App</p>"+
+                      "<p><strong>Status:</strong> ${currentBuild.currentResult}</p>"+
+                      "<p><strong>Build Number:</strong> ${BUILD_NUMBER}</p>"+
+                      "<p><strong>Check Console Output:</strong> <a href='${BUILD_URL}'>${BUILD_URL}</a></p>",
                 subject: "Build #${BUILD_NUMBER} - ${currentBuild.currentResult}",
                 to: 'sivasankar27122003@gmail.com'
             )
