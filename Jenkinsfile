@@ -15,12 +15,6 @@ pipeline {
 
     stages {
 
-        stage('Checkout Code') {
-            steps {
-                git url: 'https://github.com/siva27122003/backend_project_ci_cd.git', branch: 'master'
-            }
-        }
-
         stage('Clean Go Cache') {
             steps {
                 sh 'go clean -modcache'
