@@ -14,6 +14,12 @@ pipeline {
     }
 
     stages {
+        stage('Checkout') {
+            steps {
+                git 'https://github.com/siva27122003/backend_project_ci_cd.git'
+            }
+        }
+
         stage('Clean Go Cache') {
             steps {
                 sh 'go clean -modcache'
@@ -62,9 +68,9 @@ pipeline {
             }
         }
 
-        stage('Archive Artifacts') {
+        stage('Archive Artifact') {
             steps {
-                archiveArtifacts artifacts: 'build_bidding_app.zip, cloc_report.txt', fingerprint: true
+                archiveArtifacts artifacts: 'build_bidding_app.zip', fingerprint: true
             }
         }
     }
@@ -73,10 +79,10 @@ pipeline {
         always {
             emailext(
                 body: "<p>Build Completed</p>"+
-                      "<p><strong>Project:</strong> Bidding App</p>"+
-                      "<p><strong>Status:</strong> ${currentBuild.currentResult}</p>"+
-                      "<p><strong>Build Number:</strong> ${BUILD_NUMBER}</p>"+
-                      "<p><strong>Check Console Output:</strong> <a href='${BUILD_URL}'>${BUILD_URL}</a></p>",
+                    "<p><strong>Project:</strong> Bidding App</p>"+
+                    "<p><strong>Status:</strong> ${currentBuild.currentResult}</p>"+
+                    "<p><strong>Build Number:</strong> ${BUILD_NUMBER}</p>"+
+                    "<p><strong>Check Console Output:</strong> <a href="${BUILD_URL}">${BUILD_URL}</a></p>",
                 subject: "Build #${BUILD_NUMBER} - ${currentBuild.currentResult}",
                 to: 'sivasankar27122003@gmail.com'
             )
