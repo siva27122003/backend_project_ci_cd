@@ -34,18 +34,6 @@ pipeline {
                 '''
             }
         }
-
-        // Optional: Lint stage
-        // stage('Lint') {
-        //     steps {
-        //         sh '''
-        //         export GO111MODULE=on
-        //         go vet ./...
-        //         golint ./... || true
-        //         '''
-        //     }
-        // }
-
         stage('Test') {
             steps {
                 sh '''
